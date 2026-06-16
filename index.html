@@ -8,7 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
@@ -27,9 +27,9 @@
       --white:    #F0EDE8;
       --gray:     #737378;
       --border:   rgba(255,255,255,0.07);
-      --ff-disp:  'Anton', sans-serif;
-      --ff-cond:  'Barlow Condensed', sans-serif;
-      --ff-body:  'DM Sans', sans-serif;
+      --ff-disp:  'Bebas Neue', sans-serif;
+      --ff-cond:  'Inter', sans-serif;
+      --ff-body:  'Inter', sans-serif;
     }
 
     /* ── Reset ───────────────────────────────────── */
@@ -167,21 +167,25 @@
     .nav-links a:hover, .nav-links a:focus-visible { color: var(--white); outline: none; }
     .nav-cta {
       font-family: var(--ff-cond);
-      font-size: 12px;
+      font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--red);
-      border: 1px solid var(--red);
-      padding: 10px 24px;
+      color: var(--white);
+      background: var(--bg);
+      border: 1px solid rgba(200,22,30,0.45);
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      transition: background 0.2s ease, color 0.2s ease;
+      box-shadow: 0 0 10px 2px rgba(200,22,30,0.25), 0 0 24px 3px rgba(200,22,30,0.1);
+      transition: color 0.2s, transform 0.2s, box-shadow 0.3s ease;
     }
     .nav-cta:hover, .nav-cta:focus-visible {
-      background: var(--red);
-      color: var(--white);
+      color: #ff9090;
+      transform: translateY(-1px);
+      box-shadow: 0 0 16px 4px rgba(200,22,30,0.55), 0 0 36px 6px rgba(200,22,30,0.22);
       outline: none;
     }
     .nav-hamburger {
@@ -225,6 +229,24 @@
       background-size: cover;
       background-position: center 35%;
       transform-origin: center center;
+      opacity: 0;
+    }
+    #hero-card {
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 420px;
+      height: 520px;
+      max-width: 88vw;
+      max-height: 78vh;
+      border-radius: 18px;
+      overflow: hidden;
+      background-image: url('images/hero.jpg');
+      background-size: cover;
+      background-position: center 35%;
+      box-shadow: 0 32px 72px rgba(0,0,0,0.7);
     }
     .hero-ov {
       position: absolute;
@@ -297,9 +319,9 @@
     }
     .hero-title {
       font-family: var(--ff-disp);
-      font-size: clamp(76px, 13vw, 168px);
+      font-size: clamp(76px, 13vw, 160px);
       line-height: 0.88;
-      letter-spacing: -0.01em;
+      letter-spacing: 0.02em;
       color: var(--white);
       margin-bottom: 22px;
       overflow: hidden;
@@ -325,39 +347,51 @@
     }
     .btn-solid {
       font-family: var(--ff-cond);
-      font-size: 13px;
+      font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      background: var(--red);
       color: var(--white);
-      padding: 17px 44px;
+      background: var(--bg);
+      padding: 1rem 2.75rem;
+      border-radius: 8px;
+      border: 1px solid rgba(200,22,30,0.45);
       display: inline-block;
-      transition: background 0.2s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      text-decoration: none;
+      box-shadow: 0 0 12px 2px rgba(200,22,30,0.3), 0 0 28px 4px rgba(200,22,30,0.14);
+      transition: color 0.2s, transform 0.2s, box-shadow 0.3s ease;
     }
     .btn-solid:hover, .btn-solid:focus-visible {
-      background: var(--red-hi);
-      transform: translateY(-3px);
+      color: #ff9090;
+      transform: translateY(-2px);
+      box-shadow: 0 0 18px 4px rgba(200,22,30,0.65), 0 0 42px 8px rgba(200,22,30,0.28);
       outline: none;
     }
+    .btn-solid:active { transform: translateY(0); }
     .btn-outline {
       font-family: var(--ff-cond);
-      font-size: 13px;
+      font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      border: 1px solid rgba(240,237,232,0.28);
-      color: var(--white);
-      padding: 17px 44px;
+      color: rgba(240,237,232,0.75);
+      background: var(--bg);
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      border: 1px solid rgba(240,237,232,0.18);
       display: inline-block;
-      transition: border-color 0.2s ease, background 0.2s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      text-decoration: none;
+      box-shadow: 0 0 10px 1px rgba(240,237,232,0.04);
+      transition: color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.3s ease;
     }
     .btn-outline:hover, .btn-outline:focus-visible {
-      border-color: var(--white);
-      background: rgba(240,237,232,0.07);
-      transform: translateY(-3px);
+      color: var(--white);
+      border-color: rgba(240,237,232,0.45);
+      transform: translateY(-2px);
+      box-shadow: 0 0 16px 3px rgba(240,237,232,0.12);
       outline: none;
     }
+    .btn-outline:active { transform: translateY(0); }
     .hero-phone {
       position: absolute;
       bottom: 44px;
@@ -502,21 +536,43 @@
       padding: 52px 44px;
       position: relative;
       overflow: hidden;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.35s cubic-bezier(0.2, 0.65, 0.3, 0.9);
+      cursor: default;
+    }
+    .svc-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        650px circle at var(--mx, -500px) var(--my, -500px),
+        rgba(200,22,30,0.18),
+        transparent 40%
+      );
+      pointer-events: none;
+      opacity: var(--glow, 0);
+      z-index: 0;
     }
     .svc-card::after {
       content: '';
       position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--red);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      inset: 0;
+      padding: 1px;
+      background: radial-gradient(
+        320px circle at var(--mx, -500px) var(--my, -500px),
+        rgba(200,22,30,0.85),
+        transparent 40%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+              mask-composite: exclude;
+      opacity: var(--glow, 0);
+      pointer-events: none;
+      z-index: 0;
     }
-    .svc-card:hover { background: var(--surface); }
-    .svc-card:hover::after { transform: scaleX(1); }
+    .svc-card:hover { background: var(--surface); transform: translateY(-4px); }
     .svc-card:focus-within { background: var(--surface); }
+    .svc-num, .svc-ico, .svc-name, .svc-desc { position: relative; z-index: 1; }
     .svc-num {
       font-family: var(--ff-cond);
       font-size: 10px;
@@ -860,6 +916,39 @@
     }
     .foot-links a:hover { color: var(--white); }
 
+    /* ── Scroll Expand: overlay/canvas start hidden ─ */
+    .hero-ov, .hero-ov-edge, .hero-ov-b, .hero-glow { opacity: 0; }
+    #hero-canvas { opacity: 0; }
+
+    /* ── Scroll Expand Hint ──────────────────────── */
+    #scroll-expand-hint {
+      position: absolute;
+      bottom: 44px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      font-family: var(--ff-cond);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gray);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    #scroll-expand-hint::before,
+    #scroll-expand-hint::after {
+      content: '';
+      width: 22px;
+      height: 1px;
+      background: var(--red);
+      flex-shrink: 0;
+    }
+
     /* ── Responsive ──────────────────────────────── */
     @media (max-width: 1100px) {
       .svc-grid { grid-template-columns: repeat(2, 1fr); }
@@ -936,6 +1025,7 @@
   <!-- ── Hero ───────────────────────────────────── -->
   <section id="hero">
     <canvas id="hero-canvas"></canvas>
+    <div id="hero-card"></div>
     <div id="hero-bg"></div>
     <div class="hero-ov"></div>
     <div class="hero-ov-edge"></div>
@@ -962,6 +1052,7 @@
       <div class="scroll-bar"></div>
       <span class="hero-scroll-txt">Scroll</span>
     </div>
+    <div id="scroll-expand-hint">Scroll to Expand</div>
   </section>
 
   <!-- ── Marquee ─────────────────────────────────── -->
@@ -1296,10 +1387,7 @@
         /* Hero reveals */
         .to('#h-tag',   { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '-=0.1')
         .fromTo('#h-l1',  { y: 70 }, { opacity: 1, y: 0, duration: 0.9,  ease: 'power3.out' }, '-=0.35')
-        .fromTo('#h-l2',  { y: 70 }, { opacity: 1, y: 0, duration: 0.9,  ease: 'power3.out' }, '-=0.65')
-        .to('#h-sub',   { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.45')
-        .to('#h-btns',  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.4')
-        .to(['#h-phone','#h-scroll'], { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+        .fromTo('#h-l2',  { y: 70 }, { opacity: 1, y: 0, duration: 0.9,  ease: 'power3.out' }, '-=0.65');
     });
 
     /* ── Nav scroll state ─────────────────────────── */
@@ -1411,6 +1499,29 @@
       });
     });
 
+    /* ── Spotlight Glow Cards ─────────────────────── */
+    (function () {
+      const cards = Array.from(document.querySelectorAll('.svc-card'));
+      if (!cards.length) return;
+      const PROXIMITY = 160;
+      document.addEventListener('mousemove', e => {
+        const cx = e.clientX, cy = e.clientY;
+        cards.forEach(card => {
+          const r    = card.getBoundingClientRect();
+          const nx   = Math.max(r.left, Math.min(cx, r.right));
+          const ny   = Math.max(r.top,  Math.min(cy, r.bottom));
+          const dist = Math.hypot(cx - nx, cy - ny);
+          const glow = dist < PROXIMITY ? parseFloat((1 - dist / PROXIMITY).toFixed(3)) : 0;
+          card.style.setProperty('--mx',   (cx - r.left) + 'px');
+          card.style.setProperty('--my',   (cy - r.top)  + 'px');
+          card.style.setProperty('--glow', glow);
+        });
+      });
+      document.addEventListener('mouseleave', () => {
+        cards.forEach(card => card.style.setProperty('--glow', '0'));
+      });
+    })();
+
     /* ── THREE.JS Particle Field ──────────────────── */
     (function () {
       const canvas   = document.getElementById('hero-canvas');
@@ -1500,6 +1611,143 @@
         camera.lookAt(scene.position);
         renderer.render(scene, camera);
       })();
+    })();
+
+    /* ── Scroll Expand Hero ──────────────────────────── */
+    (function () {
+      let rawProgress = 0;   // scroll target
+      let progress    = 0;   // smoothed display value
+      let expanded    = false;
+      let rafId       = null;
+
+      const heroCard     = document.getElementById('hero-card');
+      const heroBg       = document.getElementById('hero-bg');
+      const heroContent  = document.querySelector('.hero-content');
+      const heroPhone    = document.getElementById('h-phone');
+      const heroScrollEl = document.getElementById('h-scroll');
+      const hint         = document.getElementById('scroll-expand-hint');
+      const canvas       = document.getElementById('hero-canvas');
+      const heroOv       = document.querySelector('.hero-ov');
+      const heroOvEdge   = document.querySelector('.hero-ov-edge');
+      const heroOvB      = document.querySelector('.hero-ov-b');
+      const heroGlow     = document.querySelector('.hero-glow');
+      const hSub         = document.getElementById('h-sub');
+      const hBtns        = document.getElementById('h-btns');
+
+      const CARD_W = 420, CARD_H = 520, RADIUS = 18;
+
+      function lerp(a, b, t)  { return a + (b - a) * t; }
+      function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
+      function ease(t)        { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+      function render(p) {
+        const ep = ease(p);
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        // Card: small centered box → full viewport
+        heroCard.style.width        = lerp(CARD_W, vw, ep) + 'px';
+        heroCard.style.height       = lerp(CARD_H, vh, ep) + 'px';
+        heroCard.style.borderRadius = lerp(RADIUS, 0, ep) + 'px';
+        heroCard.style.opacity      = clamp(1 - (p - 0.65) * 2.86, 0, 1);
+
+        // Real bg and overlays fade in as card expands
+        heroBg.style.opacity  = ep;
+        if (heroOv)     heroOv.style.opacity     = ep;
+        if (heroOvEdge) heroOvEdge.style.opacity = ep;
+        if (heroOvB)    heroOvB.style.opacity    = ep;
+        if (heroGlow)   heroGlow.style.opacity   = ep * 0.85;
+        if (canvas)     canvas.style.opacity     = ep;
+
+        // Hero content: centered at p=0, natural left at p=1
+        const centerTx = Math.max(0, vw / 2 - 370 - 56);
+        heroContent.style.transform = `translateX(${lerp(centerTx, 0, ep)}px)`;
+
+        // Sub & buttons appear from 65% progress
+        const mid = clamp((p - 0.65) / 0.35, 0, 1);
+        if (hSub)  hSub.style.opacity  = mid;
+        if (hBtns) hBtns.style.opacity = mid;
+
+        // Phone & scroll appear from 85% progress
+        const late = clamp((p - 0.85) / 0.15, 0, 1);
+        if (heroPhone)    heroPhone.style.opacity    = late;
+        if (heroScrollEl) heroScrollEl.style.opacity = late;
+
+        // Hint fades out quickly
+        if (hint) hint.style.opacity = clamp(1 - p * 6, 0, 1);
+      }
+
+      function animLoop() {
+        const diff = rawProgress - progress;
+        if (Math.abs(diff) > 0.0003) {
+          progress += diff * 0.075;
+          render(progress);
+          rafId = requestAnimationFrame(animLoop);
+        } else {
+          progress = rawProgress;
+          render(progress);
+          rafId = null;
+          if (progress >= 1) finish();
+        }
+      }
+
+      function scheduleAnim() {
+        if (!rafId) rafId = requestAnimationFrame(animLoop);
+      }
+
+      function finish() {
+        expanded = true;
+        heroCard.style.display       = 'none';
+        heroContent.style.transform  = '';
+        heroBg.style.opacity         = '1';
+        if (hSub)         hSub.style.opacity         = '1';
+        if (hBtns)        hBtns.style.opacity        = '1';
+        if (heroPhone)    heroPhone.style.opacity     = '1';
+        if (heroScrollEl) heroScrollEl.style.opacity  = '1';
+        if (heroOv)       heroOv.style.opacity        = '1';
+        if (heroOvEdge)   heroOvEdge.style.opacity    = '1';
+        if (heroOvB)      heroOvB.style.opacity       = '1';
+        if (heroGlow)     heroGlow.style.opacity      = '0.85';
+        if (canvas)       canvas.style.opacity        = '1';
+        if (hint)         hint.style.display          = 'none';
+        if (rafId)        { cancelAnimationFrame(rafId); rafId = null; }
+        window.removeEventListener('wheel',      onWheel);
+        window.removeEventListener('scroll',     onScroll);
+        window.removeEventListener('touchstart', onTouchStart);
+        window.removeEventListener('touchmove',  onTouchMove);
+      }
+
+      function onWheel(e) {
+        e.preventDefault();
+        // deltaMode 1 = line mode (mouse wheel), 0 = pixel mode (trackpad)
+        const delta = e.deltaMode === 1 ? e.deltaY * 0.1 : e.deltaY * 0.0025;
+        rawProgress = clamp(rawProgress + delta, 0, 1);
+        if (rawProgress >= 1) { finish(); } else { scheduleAnim(); }
+      }
+
+      let touchY = 0;
+      function onTouchStart(e) { touchY = e.touches[0].clientY; }
+      function onTouchMove(e) {
+        e.preventDefault();
+        const dy    = touchY - e.touches[0].clientY;
+        rawProgress = clamp(rawProgress + dy * 0.003, 0, 1);
+        touchY      = e.touches[0].clientY;
+        if (rawProgress >= 1) { finish(); } else { scheduleAnim(); }
+      }
+      function onScroll() { if (!expanded) window.scrollTo(0, 0); }
+
+      window.addEventListener('wheel',      onWheel,      { passive: false });
+      window.addEventListener('scroll',     onScroll,     { passive: false });
+      window.addEventListener('touchstart', onTouchStart, { passive: true  });
+      window.addEventListener('touchmove',  onTouchMove,  { passive: false });
+
+      render(0);
+      window.scrollTo(0, 0);
+
+      // Show hint after loader + hero animations (~4.5s)
+      setTimeout(function () {
+        if (!expanded && hint) hint.style.opacity = '1';
+      }, 4500);
     })();
 
   })();

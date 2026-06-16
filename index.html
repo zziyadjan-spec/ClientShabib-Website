@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Anaconda Auto Sales & Repair Shop — El Cajon's trusted auto repair and sales destination. Expert mechanics, fair prices, 4.8★ on Google.">
+  <title>Anaconda Auto — Sales &amp; Repair · El Cajon, CA</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    /* ── Variables ───────────────────────────────── */
+    :root {
+      --bg:       #060608;
+      --surface:  #0D0D12;
+      --elevated: #14141B;
+      --red:      #C8161E;
+      --red-hi:   #E01A24;
+      --red-glow: rgba(200, 22, 30, 0.18);
+      --white:    #F0EDE8;
+      --gray:     #737378;
+      --border:   rgba(255,255,255,0.07);
+      --ff-disp:  'Anton', sans-serif;
+      --ff-cond:  'Barlow Condensed', sans-serif;
+      --ff-body:  'DM Sans', sans-serif;
+    }
+
+    /* ── Reset ───────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--ff-body);
+      overflow-x: hidden;
+      cursor: none;
+    }
+    img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    a { text-decoration: none; color: inherit; }
+
+    /* Film grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9997;
+      opacity: 0.028;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 300px 300px;
+    }
+
+    /* ── Custom Cursor ───────────────────────────── */
+    .cursor, .cursor-ring {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      will-change: transform;
+    }
+    .cursor {
+      width: 7px;
+      height: 7px;
+      background: var(--red);
+      transition: opacity 0.2s ease;
+    }
+    .cursor-ring {
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(200,22,30,0.45);
+      transition: width 0.35s cubic-bezier(0.34,1.56,0.64,1),
+                  height 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .cursor-ring.hov { width: 52px; height: 52px; }
+
+    /* ── Loader ──────────────────────────────────── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    #loader-word {
+      font-family: var(--ff-disp);
+      font-size: clamp(28px, 5vw, 64px);
+      letter-spacing: 0.12em;
+      color: var(--white);
+      overflow: hidden;
+    }
+    #loader-word span { display: inline-block; }
+    #loader-bar {
+      width: 0;
+      height: 1px;
+      background: var(--red);
+      box-shadow: 0 0 12px var(--red-glow);
+    }
+
+    /* ── Navbar ──────────────────────────────────── */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 28px 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: padding 0.4s ease, background 0.4s ease;
+    }
+    #nav.stuck {
+      padding: 16px 56px;
+      background: rgba(6,6,8,0.92);
+      backdrop-filter: blur(28px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .nav-logo-main {
+      font-family: var(--ff-disp);
+      font-size: 20px;
+      letter-spacing: 0.1em;
+    }
+    .nav-logo-dot {
+      width: 5px;
+      height: 5px;
+      background: var(--red);
+      border-radius: 50%;
+      flex-shrink: 0;
+      align-self: center;
+    }
+    .nav-logo-sub {
+      font-family: var(--ff-cond);
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+    .nav-links {
+      display: flex;
+      gap: 40px;
+    }
+    .nav-links a {
+      font-family: var(--ff-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+      transition: color 0.2s ease;
+    }
+    .nav-links a:hover, .nav-links a:focus-visible { color: var(--white); outline: none; }
+    .nav-cta {
+      font-family: var(--ff-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      border: 1px solid var(--red);
+      padding: 10px 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .nav-cta:hover, .nav-cta:focus-visible {
+      background: var(--red);
+      color: var(--white);
+      outline: none;
+    }
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav-hamburger span {
+      width: 22px;
+      height: 1.5px;
+      background: var(--white);
+      display: block;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* ── Hero ────────────────────────────────────── */
+    #hero {
+      position: relative;
+      height: 100vh;
+      min-height: 680px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      /* Sits ABOVE the image + overlay so particles float over the car */
+      z-index: 5;
+      pointer-events: none;
+      /* screen blend: canvas black disappears, only colored particles show */
+      mix-blend-mode: screen;
+    }
+    #hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background-image: url('images/hero.jpg');
+      background-size: cover;
+      background-position: center 35%;
+      transform-origin: center center;
+    }
+    .hero-ov {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      /* Left side dark for text legibility; right side open so Camaro shows */
+      background: linear-gradient(100deg,
+        rgba(6,6,8,0.90) 0%,
+        rgba(6,6,8,0.72) 30%,
+        rgba(6,6,8,0.42) 58%,
+        rgba(6,6,8,0.18) 80%,
+        rgba(6,6,8,0.06) 100%
+      );
+    }
+    /* Second overlay: subtle dark vignette on the image edges */
+    .hero-ov-edge {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% 50%, transparent 40%, rgba(6,6,8,0.55) 100%);
+      pointer-events: none;
+    }
+    .hero-ov-b {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 38%;
+      z-index: 6;
+      background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    /* Red atmospheric glow — sits between image and overlay */
+    .hero-glow {
+      position: absolute;
+      bottom: -80px;
+      left: -80px;
+      width: 580px;
+      height: 580px;
+      background: radial-gradient(circle, rgba(200,22,30,0.16) 0%, transparent 70%);
+      z-index: 3;
+      pointer-events: none;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 7;
+      padding: 0 56px;
+      max-width: 740px;
+    }
+    .hero-tag {
+      font-family: var(--ff-cond);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      position: relative;
+      z-index: 7;
+    }
+    .hero-tag::before {
+      content: '';
+      width: 28px;
+      height: 1px;
+      background: var(--red);
+      flex-shrink: 0;
+    }
+    .hero-title {
+      font-family: var(--ff-disp);
+      font-size: clamp(76px, 13vw, 168px);
+      line-height: 0.88;
+      letter-spacing: -0.01em;
+      color: var(--white);
+      margin-bottom: 22px;
+      overflow: hidden;
+    }
+    .hero-title .hl1,
+    .hero-title .hl2 { display: block; opacity: 0; }
+    .hero-title .hl2 { color: var(--red); }
+    .hero-sub {
+      font-family: var(--ff-cond);
+      font-size: clamp(16px, 2vw, 22px);
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(240,237,232,0.5);
+      margin-bottom: 52px;
+      opacity: 0;
+    }
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+    }
+    .btn-solid {
+      font-family: var(--ff-cond);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: var(--red);
+      color: var(--white);
+      padding: 17px 44px;
+      display: inline-block;
+      transition: background 0.2s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .btn-solid:hover, .btn-solid:focus-visible {
+      background: var(--red-hi);
+      transform: translateY(-3px);
+      outline: none;
+    }
+    .btn-outline {
+      font-family: var(--ff-cond);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border: 1px solid rgba(240,237,232,0.28);
+      color: var(--white);
+      padding: 17px 44px;
+      display: inline-block;
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .btn-outline:hover, .btn-outline:focus-visible {
+      border-color: var(--white);
+      background: rgba(240,237,232,0.07);
+      transform: translateY(-3px);
+      outline: none;
+    }
+    .hero-phone {
+      position: absolute;
+      bottom: 44px;
+      left: 56px;
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--ff-cond);
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: var(--gray);
+      opacity: 0;
+    }
+    .hero-phone::before {
+      content: 'CALL';
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      color: var(--red);
+    }
+    .hero-scroll {
+      position: absolute;
+      bottom: 44px;
+      right: 56px;
+      z-index: 8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+    }
+    .hero-scroll-txt {
+      font-family: var(--ff-cond);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--gray);
+      writing-mode: vertical-rl;
+    }
+    .scroll-bar {
+      width: 1px;
+      height: 56px;
+      background: linear-gradient(to bottom, var(--red), transparent);
+      animation: bar-pulse 2.2s ease-in-out infinite;
+    }
+    @keyframes bar-pulse {
+      0%, 100% { opacity: 0.35; transform: scaleY(0.75); transform-origin: top; }
+      50%       { opacity: 1;    transform: scaleY(1); }
+    }
+
+    /* ── Marquee ─────────────────────────────────── */
+    .marquee-wrap {
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 18px 0;
+    }
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 26s linear infinite;
+    }
+    .marquee-track:hover { animation-play-state: paused; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .marquee-item {
+      font-family: var(--ff-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gray);
+      padding: 0 44px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 44px;
+    }
+    .marquee-item::after {
+      content: '◆';
+      color: var(--red);
+      font-size: 5px;
+    }
+
+    /* ── Section Primitives ──────────────────────── */
+    .s-label {
+      font-family: var(--ff-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--red);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .s-label::before {
+      content: '';
+      width: 22px;
+      height: 1px;
+      background: var(--red);
+      flex-shrink: 0;
+    }
+    .s-title {
+      font-family: var(--ff-disp);
+      font-size: clamp(40px, 6.5vw, 84px);
+      line-height: 0.91;
+      letter-spacing: -0.01em;
+      color: var(--white);
+    }
+
+    /* ── Services ────────────────────────────────── */
+    #services {
+      padding: 130px 56px;
+    }
+    .svc-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: end;
+      margin-bottom: 80px;
+    }
+    .svc-header p {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--gray);
+      max-width: 380px;
+    }
+    .svc-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+    }
+    .svc-card {
+      background: var(--bg);
+      padding: 52px 44px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s ease;
+    }
+    .svc-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--red);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .svc-card:hover { background: var(--surface); }
+    .svc-card:hover::after { transform: scaleX(1); }
+    .svc-card:focus-within { background: var(--surface); }
+    .svc-num {
+      font-family: var(--ff-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.4em;
+      color: var(--red);
+      margin-bottom: 36px;
+    }
+    .svc-ico {
+      font-size: 28px;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .svc-name {
+      font-family: var(--ff-cond);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      line-height: 1.15;
+      color: var(--white);
+      margin-bottom: 14px;
+    }
+    .svc-desc {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--gray);
+    }
+
+    /* ── Gallery ─────────────────────────────────── */
+    #gallery {
+      padding: 130px 56px;
+    }
+    .gal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 56px;
+    }
+    .gal-link {
+      font-family: var(--ff-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: gap 0.3s ease;
+    }
+    .gal-link:hover { gap: 18px; }
+    .gal-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .gal-item {
+      overflow: hidden;
+      position: relative;
+    }
+    /* Individual item grid placements */
+    .gi-1 { grid-column: span 2; height: 420px; }
+    .gi-2 { grid-row: span 2; }
+    .gi-3 { height: 320px; }
+    .gi-4 { height: 320px; }
+    .gi-5 { grid-column: span 2; height: 360px; }
+    .gi-6 { height: 360px; }
+    .gi-7 { grid-column: span 3; height: 300px; }
+
+    .gal-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.65s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .gal-item:hover img { transform: scale(1.06); }
+    .gal-ov {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .gal-item:hover .gal-ov { opacity: 1; }
+
+    /* ── Stats ───────────────────────────────────── */
+    #stats {
+      padding: 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--border);
+      gap: 1px;
+    }
+    .stat-cell {
+      background: var(--surface);
+      padding: 72px 48px;
+      text-align: center;
+    }
+    .stat-val {
+      font-family: var(--ff-disp);
+      font-size: clamp(52px, 7vw, 96px);
+      line-height: 1;
+      color: var(--white);
+      display: block;
+    }
+    .stat-val .s-red { color: var(--red); }
+    .stat-lbl {
+      font-family: var(--ff-cond);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-top: 14px;
+      display: block;
+    }
+
+    /* ── About ───────────────────────────────────── */
+    #about {
+      padding: 130px 56px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 96px;
+      align-items: center;
+    }
+    .about-img-wrap {
+      position: relative;
+    }
+    .about-img-inner {
+      aspect-ratio: 4/5;
+      overflow: hidden;
+      position: relative;
+    }
+    .about-img-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .about-img-wrap:hover .about-img-inner img { transform: scale(1.04); }
+    .about-accent {
+      position: absolute;
+      bottom: -18px;
+      right: -18px;
+      width: 55%;
+      height: 45%;
+      border: 1px solid rgba(200,22,30,0.35);
+      pointer-events: none;
+    }
+    .about-body {
+      font-size: 16px;
+      line-height: 1.82;
+      color: rgba(240,237,232,0.65);
+      margin: 28px 0;
+    }
+    .about-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 48px;
+    }
+
+    /* ── Reviews ─────────────────────────────────── */
+    #reviews {
+      padding: 130px 56px;
+      background: var(--surface);
+    }
+    .rev-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 64px;
+    }
+    .rev-rating {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+    .rev-big {
+      font-family: var(--ff-disp);
+      font-size: 72px;
+      line-height: 1;
+      color: var(--white);
+    }
+    .rev-stars { color: var(--red); font-size: 18px; letter-spacing: 3px; }
+    .rev-src {
+      font-size: 12px;
+      color: var(--gray);
+      letter-spacing: 0.06em;
+      margin-top: 4px;
+    }
+    .rev-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .rev-card {
+      background: var(--elevated);
+      padding: 44px;
+      border: 1px solid var(--border);
+      transition: border-color 0.3s ease;
+    }
+    .rev-card:hover { border-color: rgba(200,22,30,0.3); }
+    .rev-q {
+      font-family: Georgia, serif;
+      font-size: 52px;
+      color: var(--red);
+      opacity: 0.25;
+      line-height: 1;
+      margin-bottom: 18px;
+    }
+    .rev-txt {
+      font-size: 15px;
+      line-height: 1.75;
+      color: rgba(240,237,232,0.72);
+      margin-bottom: 36px;
+    }
+    .rev-author {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .rev-avi {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--ff-disp);
+      font-size: 15px;
+      color: var(--red);
+      flex-shrink: 0;
+    }
+    .rev-name {
+      font-family: var(--ff-cond);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+    .rev-meta { font-size: 12px; color: var(--gray); margin-top: 3px; }
+
+    /* ── Contact ─────────────────────────────────── */
+    #contact {
+      padding: 130px 56px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+    }
+    .ctc-item {
+      display: flex;
+      gap: 24px;
+      padding: 32px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .ctc-item:first-of-type { border-top: 1px solid var(--border); }
+    .ctc-ico {
+      font-size: 18px;
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+    .ctc-lbl {
+      font-family: var(--ff-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 8px;
+    }
+    .ctc-val {
+      font-size: 17px;
+      line-height: 1.55;
+      color: var(--white);
+    }
+    .ctc-val a {
+      color: var(--white);
+      transition: color 0.2s ease;
+    }
+    .ctc-val a:hover { color: var(--red); }
+    .ctc-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      justify-content: center;
+    }
+    .ctc-box-title {
+      font-family: var(--ff-disp);
+      font-size: clamp(38px, 4vw, 60px);
+      line-height: 0.92;
+      color: var(--white);
+      margin-top: 12px;
+    }
+    .ctc-box p {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--gray);
+    }
+    .btn-full {
+      display: block;
+      text-align: center;
+    }
+
+    /* ── Footer ──────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .foot-copy {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    .foot-links {
+      display: flex;
+      gap: 32px;
+    }
+    .foot-links a {
+      font-family: var(--ff-cond);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+      transition: color 0.2s ease;
+    }
+    .foot-links a:hover { color: var(--white); }
+
+    /* ── Responsive ──────────────────────────────── */
+    @media (max-width: 1100px) {
+      .svc-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .rev-grid { grid-template-columns: repeat(2, 1fr); }
+      #about { grid-template-columns: 1fr; gap: 56px; }
+      #contact { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      body { cursor: auto; }
+      .cursor, .cursor-ring { display: none; }
+      #nav { padding: 18px 24px; }
+      #nav.stuck { padding: 14px 24px; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      #services, #gallery, #about, #reviews, #contact { padding: 80px 24px; }
+      .svc-grid { grid-template-columns: 1fr; }
+      .svc-header { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .stat-cell { padding: 48px 24px; }
+      .rev-grid { grid-template-columns: 1fr; }
+      .rev-header { flex-direction: column; align-items: flex-start; gap: 32px; }
+      .hero-content { padding: 0 24px; }
+      .hero-phone { display: none; }
+      .hero-scroll { right: 24px; }
+      .gal-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+      .gi-1 { grid-column: span 2; height: 240px; }
+      .gi-2 { grid-row: span 1; height: 220px; }
+      .gi-3, .gi-4 { height: 220px; }
+      .gi-5 { grid-column: span 2; height: 220px; }
+      .gi-6 { height: 220px; }
+      .gi-7 { grid-column: span 2; height: 200px; }
+      .gal-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+      footer { flex-direction: column; gap: 20px; text-align: center; }
+      .foot-links { flex-wrap: wrap; justify-content: center; }
+      .ctc-box { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Loader ─────────────────────────────────── -->
+  <div id="loader">
+    <div id="loader-word"><span>ANACONDA AUTO</span></div>
+    <div id="loader-bar"></div>
+  </div>
+
+  <!-- ── Cursor ─────────────────────────────────── -->
+  <div class="cursor"  id="cur"></div>
+  <div class="cursor-ring" id="cur-ring"></div>
+
+  <!-- ── Navbar ─────────────────────────────────── -->
+  <nav id="nav">
+    <div class="nav-logo">
+      <span class="nav-logo-main">ANACONDA</span>
+      <span class="nav-logo-dot"></span>
+      <span class="nav-logo-sub">Auto Sales &amp; Repair</span>
+    </div>
+    <div class="nav-links" id="nav-links">
+      <a href="#services">Services</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#about">About</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <a href="tel:6194567508" class="nav-cta">Call Now</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Hero ───────────────────────────────────── -->
+  <section id="hero">
+    <canvas id="hero-canvas"></canvas>
+    <div id="hero-bg"></div>
+    <div class="hero-ov"></div>
+    <div class="hero-ov-edge"></div>
+    <div class="hero-ov-b"></div>
+    <div class="hero-glow"></div>
+
+    <div class="hero-content">
+      <p class="hero-tag" id="h-tag">El Cajon, California &nbsp;·&nbsp; 4.8 ★ Google Rating</p>
+      <h1 class="hero-title">
+        <span class="hl1" id="h-l1">ANACONDA</span>
+        <span class="hl2" id="h-l2">AUTO</span>
+      </h1>
+      <p class="hero-sub" id="h-sub">Sales &amp; Repair Shop · El Cajon, CA</p>
+      <div class="hero-btns" id="h-btns">
+        <a href="#contact" class="btn-solid">Book a Service</a>
+        <a href="#gallery" class="btn-outline">See Our Work</a>
+      </div>
+    </div>
+
+    <div class="hero-phone" id="h-phone">
+      <a href="tel:6194567508" style="color:inherit;">(619) 456-7508</a>
+    </div>
+    <div class="hero-scroll" id="h-scroll">
+      <div class="scroll-bar"></div>
+      <span class="hero-scroll-txt">Scroll</span>
+    </div>
+  </section>
+
+  <!-- ── Marquee ─────────────────────────────────── -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span class="marquee-item">Oil Change</span>
+      <span class="marquee-item">Brake Service</span>
+      <span class="marquee-item">Engine Repair</span>
+      <span class="marquee-item">Air Suspension</span>
+      <span class="marquee-item">Body Work</span>
+      <span class="marquee-item">Diagnostics</span>
+      <span class="marquee-item">Auto Sales</span>
+      <span class="marquee-item">Tire Service</span>
+      <span class="marquee-item">Transmission</span>
+      <span class="marquee-item">Oil Change</span>
+      <span class="marquee-item">Brake Service</span>
+      <span class="marquee-item">Engine Repair</span>
+      <span class="marquee-item">Air Suspension</span>
+      <span class="marquee-item">Body Work</span>
+      <span class="marquee-item">Diagnostics</span>
+      <span class="marquee-item">Auto Sales</span>
+      <span class="marquee-item">Tire Service</span>
+      <span class="marquee-item">Transmission</span>
+    </div>
+  </div>
+
+  <!-- ── Services ────────────────────────────────── -->
+  <section id="services">
+    <div class="svc-header">
+      <div>
+        <p class="s-label">What We Do</p>
+        <h2 class="s-title">EXPERT<br>SERVICES</h2>
+      </div>
+      <p>From routine maintenance to complex builds, we handle every job with the same precision and honesty El Cajon has trusted for years.</p>
+    </div>
+    <div class="svc-grid">
+      <div class="svc-card">
+        <div class="svc-num">01</div>
+        <span class="svc-ico">🔧</span>
+        <div class="svc-name">Oil Change &amp;<br>Maintenance</div>
+        <p class="svc-desc">Full synthetic and conventional oil changes, filters, fluid top-ups, and comprehensive multi-point inspections to keep your car healthy.</p>
+      </div>
+      <div class="svc-card">
+        <div class="svc-num">02</div>
+        <span class="svc-ico">🛑</span>
+        <div class="svc-name">Brake Service<br>&amp; Repair</div>
+        <p class="svc-desc">Complete brake system diagnostics, pad and rotor replacement, caliper service, and brake fluid flush for all vehicle makes and models.</p>
+      </div>
+      <div class="svc-card">
+        <div class="svc-num">03</div>
+        <span class="svc-ico">⚙️</span>
+        <div class="svc-name">Engine<br>Diagnostics</div>
+        <p class="svc-desc">Advanced OBD-II scanning, check engine diagnostics, tune-ups, and engine repair from minor issues to full rebuilds.</p>
+      </div>
+      <div class="svc-card">
+        <div class="svc-num">04</div>
+        <span class="svc-ico">🚗</span>
+        <div class="svc-name">Air Suspension<br>Systems</div>
+        <p class="svc-desc">Specializing in air bag and air ride suspension installations, leveling kits, and full system builds. We work on both daily drivers and show cars.</p>
+      </div>
+      <div class="svc-card">
+        <div class="svc-num">05</div>
+        <span class="svc-ico">🔍</span>
+        <div class="svc-name">Pre-Purchase<br>Inspection</div>
+        <p class="svc-desc">Thinking of buying a used car? Our detailed multi-point inspection gives you confidence and leverage before you sign anything.</p>
+      </div>
+      <div class="svc-card">
+        <div class="svc-num">06</div>
+        <span class="svc-ico">🏎️</span>
+        <div class="svc-name">Auto Sales &amp;<br>Financing</div>
+        <p class="svc-desc">Browse our rotating lot of hand-inspected pre-owned vehicles at fair prices. We can help with financing options too.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Gallery ──────────────────────────────────── -->
+  <section id="gallery">
+    <div class="gal-header">
+      <div>
+        <p class="s-label">Our Work</p>
+        <h2 class="s-title">THE<br>GARAGE</h2>
+      </div>
+      <a href="#contact" class="gal-link">Book a Service &nbsp;→</a>
+    </div>
+
+    <div class="gal-grid">
+      <!-- Place images in /images/ — see filenames in alt text -->
+      <div class="gal-item gi-1">
+        <img src="images/gallery-garage.jpg"     alt="gallery-garage.jpg — Exotic cars in the shop on lifts">
+        <div class="gal-ov"></div>
+      </div>
+      <div class="gal-item gi-2">
+        <img src="images/gallery-suspension.jpg" alt="gallery-suspension.jpg — Air suspension wheel well build">
+        <div class="gal-ov"></div>
+      </div>
+      <div class="gal-item gi-3">
+        <img src="images/gallery-engine.jpg"     alt="gallery-engine.jpg — Clean engine bay">
+        <div class="gal-ov"></div>
+      </div>
+      <div class="gal-item gi-4">
+        <img src="images/gallery-service.jpg"    alt="gallery-service.jpg — Oil service in progress">
+        <div class="gal-ov"></div>
+      </div>
+      <div class="gal-item gi-5">
+        <img src="images/gallery-headlights.jpg" alt="gallery-headlights.jpg — Custom headlight work">
+        <div class="gal-ov"></div>
+      </div>
+      <div class="gal-item gi-6">
+        <img src="images/gallery-bmw-m4.jpg"     alt="gallery-bmw-m4.jpg — BMW M4 CS">
+        <div class="gal-ov"></div>
+      </div>
+      <div class="gal-item gi-7">
+        <img src="images/gallery-caliper.jpg"    alt="gallery-caliper.jpg — GR brake caliper detail">
+        <div class="gal-ov"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stats ────────────────────────────────────── -->
+  <section id="stats">
+    <div class="stats-grid">
+      <div class="stat-cell">
+        <span class="stat-val">4.8<span class="s-red">★</span></span>
+        <span class="stat-lbl">Google Rating</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-val" id="cnt-cars">0<span class="s-red">+</span></span>
+        <span class="stat-lbl">Cars Serviced</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-val" id="cnt-yrs">0<span class="s-red">+</span></span>
+        <span class="stat-lbl">Years Experience</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-val">100<span class="s-red">%</span></span>
+        <span class="stat-lbl">Satisfaction</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── About ────────────────────────────────────── -->
+  <section id="about">
+    <div class="about-img-wrap">
+      <div class="about-img-inner">
+        <img src="images/gallery-engine.jpg" alt="Inside Anaconda Auto shop">
+      </div>
+      <div class="about-accent"></div>
+    </div>
+    <div class="about-text">
+      <p class="s-label">About Us</p>
+      <h2 class="s-title">BUILT ON<br>TRUST</h2>
+      <p class="about-body">
+        Anaconda Auto Sales &amp; Repair is El Cajon's trusted destination for honest, expert automotive care.
+        We specialize in everything from routine oil changes to complex air suspension builds — all done right,
+        at a fair price.
+      </p>
+      <p class="about-body">
+        Located on Broadway in El Cajon, we serve drivers from Santee, La Mesa, Spring Valley, and all across
+        San Diego County. Our team works on all makes and models with the same precision and respect for your vehicle.
+      </p>
+      <div class="about-btns">
+        <a href="tel:6194567508" class="btn-solid">Call (619) 456-7508</a>
+        <a href="https://maps.google.com/?q=1163+Broadway+El+Cajon+CA+92021" target="_blank" rel="noopener" class="btn-outline">Get Directions</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Reviews ──────────────────────────────────── -->
+  <section id="reviews">
+    <div class="rev-header">
+      <div>
+        <p class="s-label">Testimonials</p>
+        <h2 class="s-title">WHAT PEOPLE<br>ARE SAYING</h2>
+      </div>
+      <div class="rev-rating">
+        <span class="rev-big">4.8</span>
+        <div>
+          <div class="rev-stars">★★★★★</div>
+          <div class="rev-src">on Google Reviews</div>
+        </div>
+      </div>
+    </div>
+    <div class="rev-grid">
+      <div class="rev-card">
+        <div class="rev-q">"</div>
+        <p class="rev-txt">Best mechanic in El Cajon, hands down. Shabib diagnosed my car in under an hour and had it fixed same day. Fair prices, no BS — exactly what you want in a shop.</p>
+        <div class="rev-author">
+          <div class="rev-avi">M</div>
+          <div>
+            <div class="rev-name">Marcus T.</div>
+            <div class="rev-meta">★★★★★ · Google Review</div>
+          </div>
+        </div>
+      </div>
+      <div class="rev-card">
+        <div class="rev-q">"</div>
+        <p class="rev-txt">Brought my BMW in for brakes and suspension. They knocked it out perfectly. Clean shop, professional crew, and they kept me updated the whole time. Will be back for sure.</p>
+        <div class="rev-author">
+          <div class="rev-avi">S</div>
+          <div>
+            <div class="rev-name">Sarah K.</div>
+            <div class="rev-meta">★★★★★ · Google Review</div>
+          </div>
+        </div>
+      </div>
+      <div class="rev-card">
+        <div class="rev-q">"</div>
+        <p class="rev-txt">Got my full air suspension build done here and the quality is incredible. These guys know their craft. Clean work, honest communication, and way cheaper than the dealer.</p>
+        <div class="rev-author">
+          <div class="rev-avi">J</div>
+          <div>
+            <div class="rev-name">Jorge R.</div>
+            <div class="rev-meta">★★★★★ · Google Review</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contact ──────────────────────────────────── -->
+  <section id="contact">
+    <div>
+      <p class="s-label">Get In Touch</p>
+      <h2 class="s-title" style="margin-bottom:52px;">VISIT THE<br>SHOP</h2>
+
+      <div class="ctc-item">
+        <span class="ctc-ico">📍</span>
+        <div>
+          <p class="ctc-lbl">Address</p>
+          <p class="ctc-val">1163 Broadway<br>El Cajon, CA 92021</p>
+        </div>
+      </div>
+      <div class="ctc-item">
+        <span class="ctc-ico">📞</span>
+        <div>
+          <p class="ctc-lbl">Phone</p>
+          <p class="ctc-val"><a href="tel:6194567508">(619) 456-7508</a></p>
+        </div>
+      </div>
+      <div class="ctc-item">
+        <span class="ctc-ico">🕐</span>
+        <div>
+          <p class="ctc-lbl">Hours</p>
+          <p class="ctc-val">
+            Mon – Fri &nbsp; 9:00 AM – 6:00 PM<br>
+            Sat – Sun &nbsp; 10:30 AM – 5:30 PM
+          </p>
+        </div>
+      </div>
+      <div class="ctc-item">
+        <span class="ctc-ico">📘</span>
+        <div>
+          <p class="ctc-lbl">Follow Us</p>
+          <p class="ctc-val">
+            <a href="https://www.facebook.com/61571244279203" target="_blank" rel="noopener">Anaconda Auto Sales on Facebook</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctc-box">
+      <p class="s-label">Ready to Book?</p>
+      <h3 class="ctc-box-title">CALL US<br>TODAY</h3>
+      <p>Stop by the shop or give us a call. No appointment needed for most services.</p>
+      <a href="tel:6194567508" class="btn-solid btn-full" style="font-size:16px;padding:20px 48px;">(619) 456-7508</a>
+      <a href="https://maps.google.com/?q=1163+Broadway+El+Cajon+CA+92021" target="_blank" rel="noopener" class="btn-outline btn-full">Get Directions on Google Maps</a>
+    </div>
+  </section>
+
+  <!-- ── Footer ───────────────────────────────────── -->
+  <footer>
+    <p class="foot-copy">© 2024 Anaconda Auto Sales &amp; Repair Shop · El Cajon, CA</p>
+    <nav class="foot-links">
+      <a href="#services">Services</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="tel:6194567508">(619) 456-7508</a>
+    </nav>
+  </footer>
+
+  <!-- ── Scripts ──────────────────────────────────── -->
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── GSAP ─────────────────────────────────────── */
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ── Cursor ───────────────────────────────────── */
+    const cur     = document.getElementById('cur');
+    const curRing = document.getElementById('cur-ring');
+    let cX = window.innerWidth / 2, cY = window.innerHeight / 2;
+    let rX = cX, rY = cY;
+
+    document.addEventListener('mousemove', e => { cX = e.clientX; cY = e.clientY; });
+
+    (function tickCursor() {
+      rX += (cX - rX) * 0.14;
+      rY += (cY - rY) * 0.14;
+      cur.style.left     = cX + 'px';
+      cur.style.top      = cY + 'px';
+      curRing.style.left = rX + 'px';
+      curRing.style.top  = rY + 'px';
+      requestAnimationFrame(tickCursor);
+    })();
+
+    document.querySelectorAll('a, button, .svc-card, .gal-item, .rev-card').forEach(el => {
+      el.addEventListener('mouseenter', () => curRing.classList.add('hov'));
+      el.addEventListener('mouseleave', () => curRing.classList.remove('hov'));
+    });
+
+    /* ── Loader → Hero Sequence ───────────────────── */
+    window.addEventListener('load', () => {
+      const loader  = document.getElementById('loader');
+      const lBar    = document.getElementById('loader-bar');
+      const lWord   = document.querySelector('#loader-word span');
+
+      gsap.set(lWord, { y: '110%' });
+
+      const tl = gsap.timeline();
+      tl
+        .to(lBar,  { width: '200px', duration: 0.7, ease: 'power2.inOut' })
+        .to(lWord, { y: '0%', duration: 0.55, ease: 'power3.out' }, '-=0.25')
+        .to(loader, {
+            opacity: 0,
+            duration: 0.55,
+            delay: 0.65,
+            ease: 'power2.in',
+            onComplete: () => { loader.style.display = 'none'; }
+          })
+        /* Hero reveals */
+        .to('#h-tag',   { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '-=0.1')
+        .fromTo('#h-l1',  { y: 70 }, { opacity: 1, y: 0, duration: 0.9,  ease: 'power3.out' }, '-=0.35')
+        .fromTo('#h-l2',  { y: 70 }, { opacity: 1, y: 0, duration: 0.9,  ease: 'power3.out' }, '-=0.65')
+        .to('#h-sub',   { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.45')
+        .to('#h-btns',  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.4')
+        .to(['#h-phone','#h-scroll'], { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+    });
+
+    /* ── Nav scroll state ─────────────────────────── */
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('stuck', window.scrollY > 50);
+    }, { passive: true });
+
+    /* ── Hero BG Parallax ─────────────────────────── */
+    const heroBg = document.getElementById('hero-bg');
+    window.addEventListener('scroll', () => {
+      const s = window.scrollY;
+      if (s < window.innerHeight) {
+        heroBg.style.transform = `translateY(${s * 0.28}px) scale(1.06)`;
+      }
+    }, { passive: true });
+
+    /* ── Scroll Reveals ───────────────────────────── */
+    gsap.utils.toArray('.svc-card').forEach((el, i) => {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 84%' },
+        opacity: 0, y: 44,
+        duration: 0.85,
+        delay: (i % 3) * 0.1,
+        ease: 'power3.out'
+      });
+    });
+
+    gsap.utils.toArray('.gal-item').forEach((el, i) => {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 88%' },
+        opacity: 0, scale: 0.96,
+        duration: 0.75,
+        delay: i * 0.05,
+        ease: 'power3.out'
+      });
+    });
+
+    gsap.from('.stat-cell', {
+      scrollTrigger: { trigger: '#stats', start: 'top 72%' },
+      opacity: 0, y: 28, stagger: 0.1, duration: 0.8, ease: 'power3.out'
+    });
+
+    gsap.utils.toArray('.s-title').forEach(el => {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 88%' },
+        opacity: 0, y: 36, duration: 0.95, ease: 'power3.out'
+      });
+    });
+
+    gsap.from('.about-img-inner', {
+      scrollTrigger: { trigger: '#about', start: 'top 75%' },
+      opacity: 0, x: -40, duration: 1, ease: 'power3.out'
+    });
+
+    gsap.from('.about-text > *', {
+      scrollTrigger: { trigger: '#about', start: 'top 70%' },
+      opacity: 0, y: 30, stagger: 0.12, duration: 0.85, ease: 'power3.out'
+    });
+
+    gsap.from('.rev-card', {
+      scrollTrigger: { trigger: '#reviews', start: 'top 75%' },
+      opacity: 0, y: 40, stagger: 0.15, duration: 0.85, ease: 'power3.out'
+    });
+
+    /* ── Counters ─────────────────────────────────── */
+    function animCounter(id, to) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const suffix = el.querySelector('.s-red');
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 80%',
+        once: true,
+        onEnter: () => {
+          const obj = { v: 0 };
+          gsap.to(obj, {
+            v: to,
+            duration: 2,
+            ease: 'power2.out',
+            onUpdate: () => {
+              el.firstChild.nodeValue = Math.round(obj.v);
+            }
+          });
+        }
+      });
+    }
+    animCounter('cnt-cars', 500);
+    animCounter('cnt-yrs', 6);
+
+    /* ── Mobile Nav ───────────────────────────────── */
+    const hamburger = document.getElementById('hamburger');
+    const navLinks  = document.getElementById('nav-links');
+    let navOpen = false;
+
+    hamburger.addEventListener('click', () => {
+      navOpen = !navOpen;
+      navLinks.style.cssText = navOpen
+        ? 'display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:rgba(6,6,8,0.97);padding:24px 24px 32px;gap:24px;border-bottom:1px solid rgba(255,255,255,0.07);'
+        : '';
+      hamburger.querySelectorAll('span')[0].style.transform = navOpen ? 'translateY(6.5px) rotate(45deg)' : '';
+      hamburger.querySelectorAll('span')[1].style.opacity   = navOpen ? '0' : '1';
+      hamburger.querySelectorAll('span')[2].style.transform = navOpen ? 'translateY(-6.5px) rotate(-45deg)' : '';
+    });
+
+    navLinks.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        if (navOpen) hamburger.click();
+      });
+    });
+
+    /* ── THREE.JS Particle Field ──────────────────── */
+    (function () {
+      const canvas   = document.getElementById('hero-canvas');
+      const heroEl   = document.getElementById('hero');
+      const W        = window.innerWidth;
+      const H        = window.innerHeight;
+      const isMobile = W < 768;
+      const COUNT    = isMobile ? 500 : 1800;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setSize(W, H);
+
+      const scene  = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(70, W / H, 0.1, 100);
+      camera.position.z = 5;
+
+      /* Geometry */
+      const pos  = new Float32Array(COUNT * 3);
+      const cols = new Float32Array(COUNT * 3);
+
+      for (let i = 0; i < COUNT; i++) {
+        /* Spherical distribution */
+        const theta = Math.random() * Math.PI * 2;
+        const phi   = Math.acos(2 * Math.random() - 1);
+        const r     = 2.5 + Math.random() * 4.5;
+        pos[i*3]     = r * Math.sin(phi) * Math.cos(theta);
+        pos[i*3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+        pos[i*3 + 2] = r * Math.cos(phi);
+
+        if (Math.random() < 0.18) {
+          /* Red particles */
+          cols[i*3] = 0.78; cols[i*3+1] = 0.09; cols[i*3+2] = 0.12;
+        } else {
+          /* Dim white */
+          const b = 0.12 + Math.random() * 0.22;
+          cols[i*3] = b; cols[i*3+1] = b; cols[i*3+2] = b;
+        }
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('color',    new THREE.BufferAttribute(cols, 3));
+
+      const mat = new THREE.PointsMaterial({
+        size: isMobile ? 0.03 : 0.022,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.9,
+        sizeAttenuation: true
+      });
+
+      const pts = new THREE.Points(geo, mat);
+      scene.add(pts);
+
+      /* Mouse parallax */
+      let mX = 0, mY = 0;
+      document.addEventListener('mousemove', e => {
+        mX = (e.clientX / window.innerWidth  - 0.5) * 0.5;
+        mY = (e.clientY / window.innerHeight - 0.5) * 0.25;
+      });
+
+      /* Resize */
+      window.addEventListener('resize', () => {
+        const nW = window.innerWidth, nH = window.innerHeight;
+        camera.aspect = nW / nH;
+        camera.updateProjectionMatrix();
+        renderer.setSize(nW, nH);
+      });
+
+      /* Pause when hero out of view */
+      let running = true;
+      const obs = new IntersectionObserver(entries => {
+        running = entries[0].isIntersecting;
+      });
+      obs.observe(heroEl);
+
+      const clock = new THREE.Clock();
+      (function tick() {
+        requestAnimationFrame(tick);
+        if (!running) return;
+        const t = clock.getElapsedTime();
+        pts.rotation.y = t * 0.045;
+        pts.rotation.x = t * 0.018;
+        camera.position.x += (mX - camera.position.x) * 0.04;
+        camera.position.y += (-mY - camera.position.y) * 0.04;
+        camera.lookAt(scene.position);
+        renderer.render(scene, camera);
+      })();
+    })();
+
+  })();
+  </script>
+</body>
+</html>
